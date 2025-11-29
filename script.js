@@ -255,14 +255,15 @@ function resetPlanner() {
 }
 
 /* =======================================================
-   共用函數：建立用於捕捉/列印的表格內容 HTML
+   共用函數：建立用於捕捉/列印的表格內容 HTML (修復 PNG 樣式衝突)
    ======================================================= */
 
 /**
  * 建立用於 html2canvas 捕捉/列印的表格內容 HTML
+ * @param {boolean} isPrint - 是否為列印模式 (影響是否強制保留背景色)
  * @returns {string} 包含流程資料的 tbody HTML
  */
-function createCaptureTableHTML() {
+function createCaptureTableHTML(isPrint = false) {
   const tbody = document.getElementById("ceremony-tbody");
   const rows = tbody.querySelectorAll("tr");
 
@@ -279,15 +280,13 @@ function createCaptureTableHTML() {
     const duration = durationInput ? durationInput.value || "0" : "0";
 
     // 內聯樣式用於確保圖片/列印樣式正確
-    const rowStyle =
-      index % 2 === 0
-        ? "background-color: #fff;"
-        : "background-color: #f0f0f0;";
-    // 強制在列印時保留背景色
-    const printColorAdjust = "-webkit-print-color-adjust: exact; print-color-adjust: exact;";
+    const isEven = index % 2 === 0;
+    const rowBg = isEven ? "#fff" : "#f0f0f0";
+    // 列印時才需要這個強制屬性
+    const printColorAdjust = isPrint ? "-webkit-print-color-adjust: exact; print-color-adjust: exact;" : "";
 
 
-    tableBodyHtml += `<tr style="${rowStyle} ${printColorAdjust}">`;
+    tableBodyHtml += `<tr style="background-color: ${rowBg}; ${printColorAdjust}">`;
     tableBodyHtml += `<td style="width: 40%; border: 1px solid #333; padding: 12px 10px; text-align: left; font-weight: bold;">${name}</td>`;
     tableBodyHtml += `<td style="width: 30%; border: 1px solid #333; padding: 12px 10px; text-align: center; color: #333; font-weight: bold;">${time}</td>`;
     tableBodyHtml += `<td style="width: 30%; border: 1px solid #333; padding: 12px 10px; text-align: center;">${duration}</td>`;
@@ -298,9 +297,29 @@ function createCaptureTableHTML() {
   return tableBodyHtml;
 }
 
+/**
+ * 準備捕獲表格的 Header HTML 結構
+ * @param {boolean} isPrint - 是否為列印模式
+ * @returns {string} 表頭 HTML 結構
+ */
+function createCaptureHeaderHTML(isPrint = false) {
+    // 列印時才需要這個強制屬性
+    const printColorAdjustHeader = isPrint ? "-webkit-print-color-adjust: exact; print-color-adjust: exact;" : "";
+    
+    return `
+      <thead>
+        <tr>
+            <th style="width: 40%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">儀式</th>
+            <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">表定時間</th>
+            <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">規劃時長 (分)</th>
+        </tr>
+      </thead>
+    `;
+}
+
 
 /* =======================================================
-   功能一：輸出 PNG 圖片 (保留原功能)
+   功能一：輸出 PNG 圖片 (修復版)
    ======================================================= */
 async function outputSchedule() {
   const caseNameInput = document.getElementById("case-name-input");
@@ -315,16 +334,7 @@ async function outputSchedule() {
   captureHeader.textContent = `${caseName} - 出殯流程時間表`;
 
   // 設定表格的 header 和 body 內容
-  captureTable.innerHTML = `
-            <thead>
-              <tr>
-                  <th style="width: 40%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px;">儀式</th>
-                  <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px;">表定時間</th>
-                  <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px;">規劃時長 (分)</th>
-              </tr>
-            </thead>
-            ${createCaptureTableHTML()}
-        `;
+  captureTable.innerHTML = createCaptureHeaderHTML(false) + createCaptureTableHTML(false);
 
   // 2. 顯示 Modal 並準備捕捉
   document.getElementById("output-modal-title").textContent = `${caseName} - PNG 輸出`;
@@ -335,15 +345,12 @@ async function outputSchedule() {
   imageContainer.innerHTML = "正在生成圖片...";
 
   try {
+    // 使用 html2canvas 捕捉
     const canvas = await html2canvas(captureWrapper, {
       scale: 2, // 提高解析度
       backgroundColor: "#ffffff", // 確保背景為白色
       useCORS: true,
       logging: false, 
-      width: captureWrapper.offsetWidth, 
-      height: captureWrapper.offsetHeight,
-      x: captureWrapper.offsetLeft,
-      y: captureWrapper.offsetTop,
     });
 
     const dataURL = canvas.toDataURL("image/png");
@@ -373,7 +380,7 @@ async function outputSchedule() {
 }
 
 /* =======================================================
-   功能二：列印 A4 格式 (新增)
+   功能二：列印 A4 格式 (修復版)
    ======================================================= */
 
 /**
@@ -384,26 +391,13 @@ function printSchedule() {
     const caseName = caseNameInput.value.trim() || "未命名案名";
     
     // 1. 準備用於列印的 HTML 結構
-    const captureWrapper = document.getElementById("image-capture-wrapper");
     const captureHeader = document.getElementById("capture-header");
     const captureTable = document.getElementById("capture-table");
 
     captureHeader.textContent = `${caseName} - 出殯流程時間表`;
-
-    // 設置內聯樣式來確保列印時顏色保留 (print-color-adjust)
-    const printColorAdjustHeader = "-webkit-print-color-adjust: exact; print-color-adjust: exact;";
     
-    // 設定表格的 header 內容 (確保內聯樣式用於列印)
-    captureTable.innerHTML = `
-            <thead>
-              <tr>
-                  <th style="width: 40%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">儀式</th>
-                  <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">表定時間</th>
-                  <th style="width: 30%; background-color: #4caf50; color: white; border: 1px solid #333; padding: 12px 10px; ${printColorAdjustHeader}">規劃時長 (分)</th>
-              </tr>
-            </thead>
-            ${createCaptureTableHTML()}
-        `;
+    // 設定表格的 header 和 body 內容 (isPrint=true 以啟用列印專屬樣式)
+    captureTable.innerHTML = createCaptureHeaderHTML(true) + createCaptureTableHTML(true);
 
     // 2. 觸發瀏覽器列印 (它會使用 CSS 的 @media print 規則)
     window.print();
@@ -517,6 +511,6 @@ document.addEventListener("DOMContentLoaded", resetPlanner);
 window.addCeremony = addCeremony;
 window.removeCeremony = removeCeremony;
 window.outputSchedule = outputSchedule;
-window.printSchedule = printSchedule; // 新增暴露
+window.printSchedule = printSchedule; 
 window.resetPlanner = resetPlanner;
 window.calculateTimes = calculateTimes;

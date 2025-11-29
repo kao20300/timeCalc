@@ -343,58 +343,73 @@ button.add-btn:last-of-type {
 }
 
 /* ----------------------------------------------------
-   7. 列印優化 (A4 格式)
+   7. 列印優化 (@media print)
    ---------------------------------------------------- */
 @media print {
-  /* 隱藏所有不需要列印的元素 (按鈕、輸入欄、彈出視窗) */
-  body > * {
-    visibility: hidden;
+  /* 隱藏主 UI 元素 */
+  .container > *,
+  .add-btn,
+  .button-group,
+  #ceremony-table,
+  #outputModal {
+    display: none !important;
   }
 
-  /* 僅顯示 container 和用於捕捉的表格 (用來優化 A4 格式) */
-  .container,
-  #image-capture-wrapper,
-  #image-capture-wrapper * {
-    visibility: visible !important;
-    position: static !important;
+  /* 確保只有用於列印的結構顯示 */
+  #image-capture-wrapper {
+    position: static !important; /* 將隱藏的結構拉到主頁面 */
     left: auto !important;
     width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    padding: 0;
+    margin: 0;
+    /* 移除視覺效果 */
+    background-color: #fff !important;
     box-shadow: none !important;
-    color: #000 !important; /* 確保黑色文字 */
-    background-color: #fff !important; /* 確保白色背景 */
   }
-
+  
   /* 設置 A4 格式的頁面 */
   @page {
-    size: A4 portrait; /* 確保 A4 縱向格式 */
-    margin: 1cm; /* 設置邊界 */
+    size: A4 portrait;
+    margin: 1cm;
   }
   
-  /* 應用捕捉表格的樣式到列印輸出 */
-  #capture-table {
-    border-collapse: collapse;
-    width: 100%;
-    page-break-inside: avoid; /* 避免表格中間斷頁 */
-  }
-  
-  /* 確保表頭和單元格在列印時有清晰的邊界 */
-  #capture-table th,
-  #capture-table td {
-    border: 1px solid #000 !important;
-    padding: 8px !important;
-    font-size: 14pt !important;
-  }
-
+  /* 列印時的標題和表格樣式 */
   #capture-header {
     font-size: 18pt !important;
     margin-bottom: 5px !important;
     border: 1px solid #000 !important;
     background-color: #e0e0e0 !important;
-    /* 這兩個屬性用於強制列印背景顏色，但可能需要印表機設定允許 */
-    -webkit-print-color-adjust: exact; 
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #capture-table {
+    border-collapse: collapse;
+    width: 100%;
+    page-break-inside: avoid;
+  }
+  
+  /* 確保表頭和單元格在列印時有清晰的邊界和字體大小 */
+  #capture-table th,
+  #capture-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    font-size: 14pt !important;
+    color: #000 !important;
+    background-color: #fff !important; /* 確保主背景為白色 */
+  }
+
+  #capture-table th {
+    background-color: #4caf50 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* 確保表格內容的背景色在列印時被保留 (如果需要的話) */
+  #capture-table tr:nth-child(even) td {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 }
