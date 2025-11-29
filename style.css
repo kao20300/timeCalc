@@ -1,0 +1,400 @@
+/* ----------------------------------------------------
+   1. RWD 基礎設定 (手機優先)
+   ---------------------------------------------------- */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+h2 {
+  color: #333;
+  text-align: center;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  font-size: 1.5em;
+}
+
+/* 案名輸入框樣式 */
+#case-name-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ----------------------------------------------------
+   2. 表格和單元格樣式 (嚴格固定 40:30:30 比例)
+   ---------------------------------------------------- */
+
+table {
+  width: 100%;
+  margin: 10px 0;
+  border-collapse: collapse;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  table-layout: fixed; /* 確保寬度比例固定有效 */
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px 3px; /* 手機上：縮小內邊距以容納時間輸入框 */
+  text-align: center;
+  vertical-align: middle;
+}
+
+th {
+  background-color: #4caf50;
+  color: white;
+  font-size: 0.9em;
+}
+
+/* 欄位寬度嚴格固定比例 40:30:30 (適用於所有寬度) */
+#ceremony-table th:nth-child(1),
+#ceremony-table td:nth-child(1) {
+  width: 40%;
+}
+#ceremony-table th:nth-child(2),
+#ceremony-table td:nth-child(2) {
+  width: 30%;
+}
+#ceremony-table th:nth-child(3),
+#ceremony-table td:nth-child(3) {
+  width: 30%;
+}
+
+/* 拖曳時的視覺效果 */
+#ceremony-tbody tr:hover {
+  background-color: #f9f9f9;
+}
+#ceremony-tbody tr.dragging {
+  opacity: 0.5;
+  border: 2px dashed #007bff;
+}
+#ceremony-tbody tr.drag-over-top {
+  border-top: 3px solid #007bff;
+}
+#ceremony-tbody tr.drag-over-bottom {
+  border-bottom: 3px solid #007bff;
+}
+
+/* ----------------------------------------------------
+   3. 輸入框及移除按鈕的 RWD 統一配置
+   ---------------------------------------------------- */
+
+input[type="number"],
+.ceremony-name-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 表定時間輸入框：嚴格要求完整顯示 */
+input[type="time"] {
+  box-sizing: border-box;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 0;
+  width: 100%;
+  min-width: 95px;
+}
+
+/* 在極窄環境下，可能需要進一步縮小單元格的左右內邊距 */
+@media (max-width: 450px) {
+  td:nth-child(2) {
+    padding-left: 1px;
+    padding-right: 1px;
+  }
+}
+
+.ceremony-name-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0;
+}
+
+/* 移除按鈕統一視覺效果 (預設淺灰/Hover紅色) */
+.remove-btn-rwd {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.3em;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  display: inline;
+  margin-right: 5px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.remove-btn-rwd:hover,
+.remove-btn-rwd:active {
+  color: #f44336;
+}
+
+.ceremony-name-input {
+  text-align: left;
+  padding-left: 5px;
+  font-weight: normal;
+  color: #333;
+  border: none;
+  background-color: transparent;
+  flex-grow: 1;
+  min-width: 50px;
+}
+
+/* 輸出結果欄位標記 */
+.output-field {
+  background-color: #f0f8ff;
+  border: 1px solid #b0c4de;
+  color: #333 !important;
+}
+
+/* ----------------------------------------------------
+   4. 按鈕樣式 (新增流程按鈕)
+   ---------------------------------------------------- */
+
+.add-btn {
+  width: 100%;
+  margin: 0;
+  padding: 8px;
+  background-color: #4caf50;
+  color: white;
+  border: 1px solid #4caf50;
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
+}
+
+button.add-btn:first-of-type {
+  margin-bottom: 10px;
+}
+button.add-btn:last-of-type {
+  margin-top: 10px;
+}
+
+.add-btn:hover {
+  background-color: #45a049;
+}
+
+/* ----------------------------------------------------
+   5. 控制按鈕群組及彈出視窗樣式 
+   ---------------------------------------------------- */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.control-btn {
+  flex-grow: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.reset-btn {
+  background-color: #007bff;
+  color: white;
+}
+.reset-btn:hover {
+  background-color: #0056b3;
+}
+.output-btn {
+  background-color: #4caf50;
+  color: white;
+}
+.output-btn:hover {
+  background-color: #45a049;
+}
+
+.output-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none; /* 預設隱藏，由 JS 控制顯示 */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-height: 90%;
+  overflow-y: auto;
+  text-align: center; /* 讓圖片居中 */
+  box-sizing: border-box;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.close-btn {
+  font-size: 2em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  background: none;
+  line-height: 1;
+  color: #333;
+}
+.close-btn:hover {
+  color: #f44336;
+}
+
+/* ----------------------------------------------------
+   6. Media Queries - 平板及桌面 (min-width: 768px)
+   ---------------------------------------------------- */
+@media (min-width: 768px) {
+  .container {
+    padding: 20px 20px;
+  }
+
+  th,
+  td {
+    padding: 12px 5px;
+    font-size: 16px;
+  }
+
+  /* 桌面模式：保持時間輸入框的響應性和最小寬度 */
+  input[type="time"] {
+    width: 100%;
+    min-width: 110px;
+    font-size: 16px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  .ceremony-name-input {
+    text-align: left;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    padding: 3px 5px;
+    flex-grow: 1;
+  }
+
+  .remove-btn-rwd {
+    font-size: 1.5em;
+    color: #ccc;
+  }
+
+  .ceremony-name-wrapper:hover .remove-btn-rwd {
+    color: #f44336;
+  }
+
+  .button-group {
+    max-width: 768px;
+    margin: 20px auto;
+  }
+}
+
+/* ----------------------------------------------------
+   7. 列印優化 (A4 格式)
+   ---------------------------------------------------- */
+@media print {
+  /* 隱藏所有不需要列印的元素 (按鈕、輸入欄、彈出視窗) */
+  body > * {
+    visibility: hidden;
+  }
+
+  /* 僅顯示 container 和用於捕捉的表格 (用來優化 A4 格式) */
+  .container,
+  #image-capture-wrapper,
+  #image-capture-wrapper * {
+    visibility: visible !important;
+    position: static !important;
+    left: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    color: #000 !important; /* 確保黑色文字 */
+    background-color: #fff !important; /* 確保白色背景 */
+  }
+
+  /* 設置 A4 格式的頁面 */
+  @page {
+    size: A4 portrait; /* 確保 A4 縱向格式 */
+    margin: 1cm; /* 設置邊界 */
+  }
+  
+  /* 應用捕捉表格的樣式到列印輸出 */
+  #capture-table {
+    border-collapse: collapse;
+    width: 100%;
+    page-break-inside: avoid; /* 避免表格中間斷頁 */
+  }
+  
+  /* 確保表頭和單元格在列印時有清晰的邊界 */
+  #capture-table th,
+  #capture-table td {
+    border: 1px solid #000 !important;
+    padding: 8px !important;
+    font-size: 14pt !important;
+  }
+
+  #capture-header {
+    font-size: 18pt !important;
+    margin-bottom: 5px !important;
+    border: 1px solid #000 !important;
+    background-color: #e0e0e0 !important;
+    /* 這兩個屬性用於強制列印背景顏色，但可能需要印表機設定允許 */
+    -webkit-print-color-adjust: exact; 
+    print-color-adjust: exact;
+  }
+}
